@@ -1,0 +1,49 @@
+schema = 1
+id = "weather_glass"
+name = "Weather Glass"
+version = "0.1.0"
+api = "0.1"
+description = "Rain drops, running streaks, snow and frost on your windows, at 64 pixels per block."
+authors = ["Vaspyyy"]
+license = "MIT"
+
+[material]
+file = "material.wgsl"
+name = "Weather glass"
+
+[[tags]]
+id = "glass"
+sprites = ["block/glass", "block/tinted_glass", "block/*_stained_glass"]
+
+[[options]]
+id = "drops"
+name = "Drops"
+description = "Beads of rain that sit on the glass."
+type = "bool"
+default = true
+
+[[options]]
+id = "streaks"
+name = "Streaks"
+description = "Drops that run down the glass."
+type = "bool"
+default = true
+
+[[options]]
+id = "frost"
+name = "Snow & frost"
+description = "Frost that creeps in from the edges while it snows."
+type = "bool"
+default = true
+
+[[options]]
+id = "density"
+name = "Density"
+type = "float"
+default = 1.0
+min = 0.25
+max = 2.0
+step = 0.05
+
+[budget]
+gpu_ms = 0.3
