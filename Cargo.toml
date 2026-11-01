@@ -1,0 +1,12 @@
+[package]
+name = "horizon-mod-ironfall"
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+publish = false
+description = "Ironfall, an artillery native mod for Horizon: shells that arc, smoke, cut craters and are heard far away."
+
+# The mod's rules and their tests: the same file the bundle adds to the game
+# (as game::ironfall_ballistics).
+[lib]
+path = "src/lib.rs"

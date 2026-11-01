@@ -1,0 +1,24 @@
+schema = 1
+id = "ironfall_skies"
+name = "Ironfall Skies"
+version = "0.1.0"
+api = "0.1"
+description = "Ironfall's mushroom clouds and rolling dust walls, ray marched over the world from what the mod hands the pack (frame.mods)."
+authors = ["Vaspyyy"]
+license = "MIT"
+
+[[post]]
+file = "cloud.wgsl"
+name = "Blast clouds"
+
+[[options]]
+id = "steps"
+name = "Cloud detail"
+description = "Steps along each ray through a cloud: more is smoother and slower."
+type = "int"
+default = 24
+min = 8
+max = 48
+
+[budget]
+gpu_ms = 1.0

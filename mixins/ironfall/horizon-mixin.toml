@@ -1,0 +1,100 @@
+[mod]
+id = "ironfall"
+version = "0.2.0"
+priority = 100
+
+# The commit of horizon main it was checked on. It uses only the native hook
+# points (hooks 84 in compatibility.json, once main's pending hook numbers are
+# stamped): it builds on any Horizon that has them.
+[compatibility]
+horizon_revision = "8c02c0b8534e11b7bb8be14238b140a8534280a0"
+
+[[module]]
+id = "ballistics"
+file = "crates/horizon-client/src/game.rs"
+name = "ironfall_ballistics"
+source = "ironfall_ballistics.rs"
+
+[[module]]
+id = "glue"
+file = "crates/horizon-client/src/game.rs"
+name = "ironfall_glue"
+source = "ironfall_glue.rs"
+
+[[module]]
+id = "client"
+file = "crates/horizon-client/src/game.rs"
+name = "ironfall_client"
+source = "ironfall_client.rs"
+
+[[injection]]
+id = "register"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_register_commands"
+helper = "register.rs"
+bindings = [
+  { name = "commands", ty = "&mut Vec<crate::game::native_server::NativeCommand>", value = "&mut *commands" },
+]
+
+[[injection]]
+id = "command"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_perform_command"
+helper = "command.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "command", ty = "&str", value = "command" },
+  { name = "ran", ty = "&mut bool", value = "&mut *ran" },
+]
+
+[[injection]]
+id = "level-tick"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_level_tick_post"
+helper = "tick.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" },
+]
+
+[[injection]]
+id = "client-tick"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_tick"
+helper = "client_tick.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+]
+
+[[injection]]
+id = "from-server"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_net_from_server"
+helper = "net.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "channel", ty = "&str", value = "channel" },
+  { name = "data", ty = "&[u8]", value = "data" },
+]
+
+[[injection]]
+id = "camera-shake"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_camera_shake"
+helper = "shake.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "self" },
+  { name = "partial", ty = "f32", value = "partial" },
+  { name = "shake", ty = "&mut crate::game::native_hooks::NativeShake", value = "&mut *shake" },
+]
+
+[[injection]]
+id = "shader-params"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_shader_params"
+helper = "shader_params.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "self" },
+  { name = "partial", ty = "f32", value = "partial" },
+  { name = "params", ty = "&mut [[f32; 4]; 8]", value = "&mut *params" },
+]
