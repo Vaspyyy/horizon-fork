@@ -3778,6 +3778,7 @@ impl Game<'_> {
                 r.knockback = Some([p.velocity.x, p.velocity.y, p.velocity.z]);
             }
         }
+        self.combat.hurt_landed = outcome.hurt;
         outcome.hurt
     }
     /// `LivingEntity.knockback` on the player: pushed `power` away from the

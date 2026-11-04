@@ -255,12 +255,31 @@ impl Game<'_> {
             Victim::Guest(conn) => self.guest_hit_by(&mut host, conn, |g| {
                 g.combat.refuse_player_hit = refused;
                 g.combat.projectile_attacker = shooter;
+                g.combat.hurt_landed = false;
                 let r = g.projectile_hit(p, on_player);
                 g.combat.refuse_player_hit = false;
                 g.combat.projectile_attacker = None;
-                r
+                (r, std::mem::take(&mut g.combat.hurt_landed))
             }),
         };
+        let (result, landed) = result.map_or((None, false), |(r, landed)| (Some(r), landed));
+        // AbstractArrow.onHitEntity: an arrow whose hurt landed on a player
+        // sends its owner, when another player, PLAY_ARROW_HIT_SOUND.
+        if landed && matches!(p.kind, ProjectileKind::Arrow { .. }) {
+            let Victim::Guest(victim) = victim;
+            match p.guest {
+                Some(conn) if conn != victim => host.hub.arrow_hit_player(conn),
+                Some(_) => {}
+                // The host shot it: ClientPacketListener.handleGameEvent plays
+                // ARROW_HIT_PLAYER at the player's eyes.
+                None => {
+                    if let Some(eye) = self.eye_position() {
+                        self.audio
+                            .play("minecraft:entity.arrow.hit_player", Some(eye), 0.18, 0.45);
+                    }
+                }
+            }
+        }
         self.lan = Some(host);
         result.unwrap_or(Ok(()))
     }

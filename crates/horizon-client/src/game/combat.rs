@@ -104,6 +104,8 @@ pub(super) struct CombatTracker {
     /// The projectile hitting the player now is another player's that
     /// `ServerPlayer.canHarmPlayer` refuses (the `pvp` rule, an ally).
     pub(super) refuse_player_hit: bool,
+    /// The last hurt on the player landed (`hurtServer` returned true).
+    pub(super) hurt_landed: bool,
     /// The hit on the player now runs its post-attack effects (thorns) only
     /// if the player lives through it (`WitherSkull.onHitEntity`).
     pub(super) post_attack_if_alive: bool,

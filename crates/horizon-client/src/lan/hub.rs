@@ -47,6 +47,7 @@ pub mod game_event {
     pub const START_RAINING: u8 = 1;
     pub const STOP_RAINING: u8 = 2;
     pub const CHANGE_GAME_MODE: u8 = 3;
+    pub const PLAY_ARROW_HIT_SOUND: u8 = 6;
     pub const RAIN_LEVEL: u8 = 7;
     pub const THUNDER_LEVEL: u8 = 8;
     pub const GUARDIAN_ELDER_EFFECT: u8 = 10;
@@ -4058,6 +4059,18 @@ impl Hub {
         }
     }
 
+    /// `AbstractArrow.onHitEntity`: the player whose arrow hurt another
+    /// player is sent PLAY_ARROW_HIT_SOUND, the hit's ding.
+    pub fn arrow_hit_player(&self, conn: u32) {
+        self.send_to(
+            conn,
+            &C::GameEvent(play::GameEvent {
+                event: game_event::PLAY_ARROW_HIT_SOUND,
+                param: 0.0,
+            }),
+        );
+    }
+
     /// A respawn point whose block is gone or blocked: the respawning player
     /// is sent NO_RESPAWN_BLOCK_AVAILABLE and says
     /// `block.minecraft.spawn.not_valid` in its chat.
@@ -5207,6 +5220,30 @@ mod tests {
         // Without a ring, nothing.
         requeue_ring(&mut far, &sent, (0, 0), 10, 10);
         assert!(far.is_empty());
+    }
+
+    /// `AbstractArrow.onHitEntity`: the shooter whose arrow hurt another
+    /// player gets PLAY_ARROW_HIT_SOUND (event 6) and nobody else does.
+    #[test]
+    fn arrow_hit_player_sends_the_shooter_game_event_6() {
+        let (hub, rx) = hub_with_a_guest();
+        hub.arrow_hit_player(2);
+        assert!(rx.try_recv().is_err(), "another player gets nothing");
+        hub.arrow_hit_player(1);
+        let body = match rx.try_recv().expect("packet should be sent to the shooter") {
+            crate::lan::Out::Packet(b) => b,
+            _ => panic!("expected Out::Packet"),
+        };
+        let mut reader = horizon_protocol::buf::Reader::new(&body);
+        let id = reader.varint().unwrap();
+        match play::Clientbound::decode(id, &body[reader.position()..]).unwrap() {
+            play::Clientbound::GameEvent(p) => {
+                assert_eq!(p.event, 6);
+                assert_eq!(p.event, game_event::PLAY_ARROW_HIT_SOUND);
+                assert_eq!(p.param, 0.0);
+            }
+            other => panic!("expected GameEvent, got {other:?}"),
+        }
     }
 
     /// `MinecraftServer.onGameRuleChanged`: setting `limited_crafting` updates the hub's state
