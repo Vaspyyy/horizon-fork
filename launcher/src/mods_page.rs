@@ -1415,14 +1415,7 @@ impl Launcher {
             .p(px(16.))
             .text_size(px(theme::UI.px))
             .text_color(t.ink)
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(8.))
-                    .child(div().flex_none().size(px(8.)).bg(t.danger))
-                    .child(reason.to_owned()),
-            )
+            .child(div().text_color(t.danger).child(reason.to_owned()))
             .child(
                 div()
                     .flex()

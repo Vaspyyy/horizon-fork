@@ -412,22 +412,12 @@ impl Launcher {
             } else {
                 div().flex_none().w(px(20.)).into_any_element()
             };
-            // The registry's rows end with downloads, after a native mod's fit when it isn't
-            // fine; the others' with how they run (`compat`).
-            let pill = ui::status_pill(tr(status.label), glass_tone(status.tone));
-            let right = if p.source == SourceId::Horizon {
-                div()
-                    .flex()
-                    .flex_none()
-                    .items_center()
-                    .gap(px(10.))
-                    .when(status.fit && status.tone != Tone::Good, |d| d.child(pill))
-                    .child(
-                        ui::text(13., FontWeight::NORMAL, 0.5)
-                            .child(count(p.downloads).to_uppercase()),
-                    )
+            // The registry's rows end with downloads, or a native mod's fit when it isn't fine;
+            // the others' with how they run (`compat`).
+            let right = if p.source == SourceId::Horizon && status.tone == Tone::Good {
+                ui::text(13., FontWeight::NORMAL, 0.5).child(count(p.downloads).to_uppercase())
             } else {
-                pill
+                ui::status_pill(tr(status.label), glass_tone(status.tone))
             };
             let id = p.id.clone();
             list = list.child(
@@ -666,7 +656,7 @@ impl Launcher {
                         .child(a)
                 }))
                 .child(div().flex().mt(px(16.)).child(ui::status_pill(
-                    if status.fit {
+                    if status.fit && status.tone != Tone::Good {
                         tr(status.label).to_string()
                     } else {
                         trf("{support} in Horizon", &[("support", tr(status.label))])

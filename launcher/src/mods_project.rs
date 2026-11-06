@@ -730,15 +730,17 @@ impl Launcher {
         let busy = self.mods.busy.as_ref().map(|b| b.0.clone());
         let installed = self.mods.entry(&p).is_some();
         let checking = self.mods.checking(&p);
-        let mut action = div().flex().items_center().gap(px(8.)).child(
-            caps(if checking {
-                tr("Checking")
-            } else {
-                tr(status.label)
-            })
-            .flex_none()
-            .text_color(color),
-        );
+        let word = if checking {
+            tr("Checking")
+        } else {
+            tr(status.label)
+        };
+        // The glass look's status sits in a pill, legible over any background picture.
+        let word = match t.glass {
+            true => crate::glass_ui::status_pill(word, color),
+            false => caps(word).flex_none().text_color(color),
+        };
+        let mut action = div().flex().items_center().gap(px(8.)).child(word);
         if busy.as_deref() == Some(p.id.as_str()) {
             action = action.child(caps(tr("Installing")).text_color(t.accent));
         } else if installed {

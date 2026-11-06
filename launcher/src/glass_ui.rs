@@ -79,7 +79,7 @@ pub fn danger() -> Hsla {
     })
 }
 
-/// A status in a pill: a dot and a word in `tone`, over a backing (the scrim's dark, or white in
+/// A status in a pill: a word in `tone`, over a backing (the scrim's dark, or white in
 /// light) and an outline in `tone`, so it stays legible over any background picture.
 pub fn status_pill(label: impl Into<SharedString>, tone: Hsla) -> Div {
     let backing = if light() {
@@ -91,14 +91,12 @@ pub fn status_pill(label: impl Into<SharedString>, tone: Hsla) -> Div {
         div()
             .flex()
             .items_center()
-            .gap(px(6.))
             .h(px(24.))
             .px(px(10.))
             .rounded_full()
             .bg(tone.opacity(0.14))
             .border_1()
             .border_color(tone.opacity(0.6))
-            .child(div().flex_none().size(px(7.)).rounded_full().bg(tone))
             .child(
                 text(13., FontWeight::MEDIUM, ink::FULL)
                     .text_color(tone)
